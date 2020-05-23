@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
 import { connect } from 'react-redux';
 import {setAlert} from '../../actions/alert';
+import { register } from '../../actions/auth';
+import { Redirect } from 'react-router-dom';
 
-const Register = ({setAlert}) => {
+const Register = ({setAlert, register, isAuthenticated}) => {
 
     const [formData, setFormData] = useState({
         name: "",
@@ -22,26 +24,12 @@ const Register = ({setAlert}) => {
         if(password !== password2) {
             setAlert('Passwords do no match', 'danger');
         } else {
-            // const newUser = {
-            //     name,
-            //     email,
-            //     password
-            // }
-
-            // try {
-            //     const config = {
-            //         headers: {
-            //             'Content-Type': 'application/json'
-            //         }
-            //     }
-            //     const body = JSON.stringify(newUser);
-            //     const res = await axios.post('/api/users', body, config);
-            //     console.log(res.data);
-            // } catch (error) {
-            //     console.error(error.response.data);
-            // }
-            console.log('success');
+           register({name,email,password});
         }
+    }
+
+    if(isAuthenticated) {
+      return <Redirect to="/dashboard" />
     }
 
     return (
@@ -50,7 +38,7 @@ const Register = ({setAlert}) => {
         <p className="lead"><i className="fas fa-user"></i> Create Your Account</p>
       <form className="form" onSubmit={e => onSubmit(e)}>
         <div className="form-group">
-          <input type="text" placeholder="Name" name="name" value={name} onChange={e => onChange(e)} required />
+          <input type="text" placeholder="Name" name="name" value={name} onChange={e => onChange(e)}  />
         </div>
         <div className="form-group">
           <input type="email" placeholder="Email Address" name="email" value={email} onChange={e => onChange(e)} />
@@ -64,7 +52,6 @@ const Register = ({setAlert}) => {
             type="password"
             placeholder="Password"
             name="password"
-            minLength="6"
             value={password}
             onChange={e => onChange(e)}
           />
@@ -74,7 +61,6 @@ const Register = ({setAlert}) => {
             type="password"
             placeholder="Confirm Password"
             name="password2"
-            minLength="6"
             value={password2}
             onChange={e => onChange(e)}
           />
@@ -88,4 +74,8 @@ const Register = ({setAlert}) => {
     )
 }
 
-export default connect(null, { setAlert }) (Register);
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated
+});
+
+export default connect(mapStateToProps, { setAlert,register }) (Register);
